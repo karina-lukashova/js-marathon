@@ -66,16 +66,7 @@ function init() {
   enemy.renderHP();
 }
 
-function random(num) {
-  return Math.ceil(Math.random() * num);
-}
-
-function kick(button, kickName, count) {
-  button.addEventListener('click', function () {
-    character.changeHP(random(count));
-    enemy.changeHP(random(count));
-  }) 
-}
+const random = (num) => Math.ceil(Math.random() * num);
 
 function generateLog(firstPerson, secondPerson, count) {
   const {name, elHP} = firstPerson;
@@ -97,26 +88,26 @@ function generateLog(firstPerson, secondPerson, count) {
   return logs[random(logs.length) - 1];
 }
 
-init();
-
-kick($btn, 'Thunder Jolt', 20);
-kick($btn2, 'Dragon Breath', 30);
-
-function kickCount (kickName, button, countMax) {
-  let count = 0;
+function kick (kickName, button, countDamage, countKickMax) {
+  let countKick = 0;
   
   return function () {
-    if (count < countMax - 1) {
-      count++;
-      let countElse = countMax - count;
-      console.log(`Количество кликов по удару ${kickName}: ${count}. Осталось кликов: ${countElse}.`);
+    countKick++;
+    let countKickElse = countKickMax - countKick;
+
+    character.changeHP(random(countDamage));
+    enemy.changeHP(random(countDamage));
+
+    if (countKick < countKickMax) {
+      console.log(`Количество кликов по удару ${kickName}: ${countKick}. Осталось кликов: ${countKickElse}.`);
     } else {
-      count++;
-      console.log(`Количество кликов по удару ${kickName}: ${count}. Это был последний удар ${kickName}!`);
+      console.log(`Количество кликов по удару ${kickName}: ${countKick}. Это был последний удар ${kickName}!`);
       button.disabled = true;
     }
   }
 }
 
-$btn.addEventListener('click', kickCount('Thunder Jolt', $btn, 5));
-$btn2.addEventListener('click', kickCount('Dragon Breath', $btn2, 5));
+init();
+
+$btn.addEventListener('click', kick('Thunder Jolt', $btn, 20, 6));
+$btn2.addEventListener('click', kick('Dragon Breath', $btn2, 30, 6));
