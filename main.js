@@ -88,15 +88,15 @@ function generateLog(firstPerson, secondPerson, count) {
   return logs[random(logs.length) - 1];
 }
 
-function kick (kickName, button, countDamage, countKickMax) {
+function kick (firstPerson, secondPerson, kickName, button, countDamage, countKickMax) {
   let countKick = 0;
   
   return function () {
     countKick++;
     let countKickElse = countKickMax - countKick;
 
-    character.changeHP(random(countDamage));
-    enemy.changeHP(random(countDamage));
+    firstPerson.changeHP(random(countDamage));
+    secondPerson.changeHP(random(countDamage));
 
     if (countKick < countKickMax) {
       console.log(`Количество кликов по удару ${kickName}: ${countKick}. Осталось кликов: ${countKickElse}.`);
@@ -109,5 +109,5 @@ function kick (kickName, button, countDamage, countKickMax) {
 
 init();
 
-$btn.addEventListener('click', kick('Thunder Jolt', $btn, 20, 6));
-$btn2.addEventListener('click', kick('Dragon Breath', $btn2, 30, 6));
+$btn.addEventListener('click', kick(character, enemy, 'Thunder Jolt', $btn, 20, 6));
+$btn2.addEventListener('click', kick(character, enemy, 'Dragon Breath', $btn2, 30, 6));
