@@ -1,16 +1,12 @@
 const $btn = document.getElementById('btn-kick');
 const $btn2 = document.getElementById('btn-kick-2');
 
-
-
 function renderHPLife() {
-  const {elHP, damageHP, defaultHP} = this;
-  elHP.innerText = damageHP + ' / ' + defaultHP;
+  this.elHP.innerText = this.damageHP + ' / ' + this.defaultHP;
 }
 
 function renderProgressbarHP() {
-  const {elProgressbar, damageHP, defaultHP} = this;
-  elProgressbar.style.width = damageHP / defaultHP * 100 + '%';
+  this.elProgressbar.style.width = this.damageHP / this.defaultHP * 100 + '%';
 }
 
 function renderHP() {
@@ -70,17 +66,7 @@ function init() {
   enemy.renderHP();
 }
 
-function random(num) {
-  return Math.ceil(Math.random() * num);
-}
-
-function kick(button, kickName, count) {
-  button.addEventListener('click', function () {
-    console.log('Kick: ' + kickName);
-    character.changeHP(random(count));
-    enemy.changeHP(random(count));
-  }) 
-}
+const random = (num) => Math.ceil(Math.random() * num);
 
 function generateLog(firstPerson, secondPerson, count) {
   const {name, elHP} = firstPerson;
@@ -102,7 +88,26 @@ function generateLog(firstPerson, secondPerson, count) {
   return logs[random(logs.length) - 1];
 }
 
+function kick (firstPerson, secondPerson, kickName, button, countDamage, countKickMax) {
+  let countKick = 0;
+  
+  return function () {
+    countKick++;
+    let countKickElse = countKickMax - countKick;
+
+    firstPerson.changeHP(random(countDamage));
+    secondPerson.changeHP(random(countDamage));
+
+    if (countKick < countKickMax) {
+      console.log(`Количество кликов по удару ${kickName}: ${countKick}. Осталось кликов: ${countKickElse}.`);
+    } else {
+      console.log(`Количество кликов по удару ${kickName}: ${countKick}. Это был последний удар ${kickName}!`);
+      button.disabled = true;
+    }
+  }
+}
+
 init();
 
-kick($btn, 'Thunder Jolt', 20);
-kick($btn2, 'Dragon Breath', 30);
+$btn.addEventListener('click', kick(character, enemy, 'Thunder Jolt', $btn, 20, 6));
+$btn2.addEventListener('click', kick(character, enemy, 'Dragon Breath', $btn2, 30, 6));
