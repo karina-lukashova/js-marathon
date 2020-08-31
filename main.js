@@ -90,6 +90,8 @@ function generateLog(firstPerson, secondPerson, count) {
 
 function kick (firstPerson, secondPerson, kickName, button, countDamage, countKickMax) {
   let countKick = 0;
+  const innerText = button.innerText;
+  button.innerText = `${innerText} (${countKick} / ${countKickMax})`;
   
   return function () {
     countKick++;
@@ -100,8 +102,10 @@ function kick (firstPerson, secondPerson, kickName, button, countDamage, countKi
 
     if (countKick < countKickMax) {
       console.log(`Количество кликов по удару ${kickName}: ${countKick}. Осталось кликов: ${countKickElse}.`);
+      button.innerText = `${innerText} (${countKick} / ${countKickMax})`;
     } else {
       console.log(`Количество кликов по удару ${kickName}: ${countKick}. Это был последний удар ${kickName}!`);
+      button.innerText = `${innerText} (${countKick} / ${countKickMax})`;
       button.disabled = true;
     }
   }
