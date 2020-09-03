@@ -1,55 +1,89 @@
 import Pokemon from "./pokemon.js";
 import generateLog from "./generateLog.js";
 import random from "./random.js";
+import countBtn from "./countBtn.js";
+import generatePlayers from "./generatePlayers.js";
 
-const player1 = new Pokemon({
-  name: 'Pikachu',
-  defaultHP: 100,
-  damageHP: 100,
-  selectors: 'character'
+let player1 = new Pokemon({
+  ...generatePlayers(),
+  selectors: 'player1'
 });
 
-const player2 = new Pokemon({
-  name: 'Charmander',
-  defaultHP: 100,
-  damageHP: 100,
-  selectors: 'enemy'
+let player2 = new Pokemon({
+  ...generatePlayers(),
+  selectors: 'player2'
 });
 
-const $btn = document.getElementById('btn-kick');
-const $btn2 = document.getElementById('btn-kick-2');
+const $control = document.querySelector('.control');
+const $elImg1 = document.getElementById('img-player1');
+const $elImg2 = document.getElementById('img-player2');
+const $elName1 = document.getElementById('name-player1');
+const $elName2 = document.getElementById('name-player2');
+const $logs = document.querySelector('#logs');
 
-function kick (firstPerson, secondPerson, kickName, button, countDamage, countKickMax) {
-  let countKick = 0;
-  const innerText = button.innerText;
-  button.innerText = `${innerText} (${countKick} / ${countKickMax})`;
-
-  const $p1 = document.createElement('p');
-  const $p2 = document.createElement('p');
-  const $logs = document.querySelector('#logs');
-  
-  return function () {
-    countKick++;
-    let countKickElse = countKickMax - countKick;
-
-    firstPerson.changeHP(random(countDamage), $btn, $btn2, function(count) {
-      $p1.innerText = generateLog(firstPerson, secondPerson, count);
-      $logs.insertBefore($p1, $logs.children[0]);
-    });
-
-    secondPerson.changeHP(random(countDamage), $btn, $btn2, function(count) {
-      $p2.innerText = generateLog(secondPerson, firstPerson, count);
-      $logs.insertBefore($p2, $logs.children[0]);
-    });
-
-    if (countKick < countKickMax) {
-      button.innerText = `${innerText} (${countKick} / ${countKickMax})`;
-    } else {
-      button.innerText = `${innerText} (${countKick} / ${countKickMax})`;
-      button.disabled = true;
-    }
-  }
+function changeImgName () {
+  $elImg1.src = player1.img;
+  $elName1.innerText = player1.name;
+  $elImg2.src = player2.img;
+  $elName2.innerText = player2.name;
 }
 
-$btn.addEventListener('click', kick(player1, player2, 'Thunder Jolt', $btn, 20, 6));
-$btn2.addEventListener('click', kick(player1, player2, 'Dragon Breath', $btn2, 30, 6));
+function showLog (player, enemy, remainHP) {
+  const $p = document.createElement('p');
+  $p.innerText = generateLog(enemy, player, remainHP);
+  $logs.insertBefore($p, $logs.children[0]);
+}
+
+function attackEnemy (player, enemy) {
+  changeImgName();
+  player.attacks.forEach(item => {
+    const $btn = document.createElement('button');
+    $btn.classList.add('button');
+    $btn.innerText = item.name;
+    $control.appendChild($btn);
+    $control.style.flexDirection = 'column';
+    const btnCount = countBtn($btn, item.maxCount);
+  
+    $btn.addEventListener('click', () => {
+      btnCount();
+      const beforeHP = enemy.damageHP;
+      enemy.changeHP(random(item.maxDamage, item.minDamage));
+      const remainHP = beforeHP - enemy.damageHP;
+      showLog(player, enemy, remainHP);
+    });
+  });
+}
+
+function resetGame () {
+  const allButtons = document.querySelectorAll('.control .button');
+  allButtons.forEach($item => $item.remove());
+
+  const $startBtn = document.createElement('button');
+  $startBtn.classList.add('button');
+  $startBtn.innerText = 'Start New Game';
+  $control.appendChild($startBtn);
+  $control.style.flexDirection = 'row';
+
+  $startBtn.addEventListener('click', function startGame() {
+    player1 = new Pokemon({
+      ...generatePlayers(),
+      selectors: 'player1'
+    });
+    player2 = new Pokemon({
+      ...generatePlayers(),
+      selectors: 'player2'
+    });
+    $logs.innerText = '';
+    player1.elProgressbar.classList.remove('low');
+    player1.elProgressbar.classList.remove('critical');
+    player2.elProgressbar.classList.remove('low');
+    player2.elProgressbar.classList.remove('critical');
+    attackEnemy(player1, player2);
+    attackEnemy(player2, player1);
+    $startBtn.remove();
+  });
+}
+
+resetGame();
+
+export {resetGame};

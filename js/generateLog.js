@@ -17,7 +17,7 @@ function generateLog(firstPerson, secondPerson, count) {
     `${name} пытался что-то сказать, но вдруг, неожиданно ${nameSecond} со скуки, разбил бровь сопернику. ${name} получил урон -${count}, теперь у него ${elHP.innerText} жизней.`
   ];  
 
-  return logs[random(logs.length) - 1];
+  return logs[Math.ceil(Math.random() *(logs.length - 1))];
 }
 
 export default generateLog;
